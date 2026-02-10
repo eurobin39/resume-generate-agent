@@ -194,7 +194,7 @@ def _summarize_feedback(feedback: str) -> str:
 
 
 def _save_resume_artifact(resume_tex: str) -> None:
-    out_dir = Path("/Users/eurobae/SWENG/sweng1_Microsoft/resume-agent-demo/resume-generate-agent/resume_result")
+    out_dir = Path(__file__).resolve().parent / "resume_result"
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / "resume.tex"
     out_path.write_text(resume_tex, encoding="utf-8")
