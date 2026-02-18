@@ -1,2 +1,5 @@
-openai==2.17.0
+agent-framework-core==1.0.0b260212
+agent-framework-azure
+agent-framework-orchestrations
+azure-identity
 python-dotenv==1.0.1

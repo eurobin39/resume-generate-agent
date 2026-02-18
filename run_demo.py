@@ -2,10 +2,7 @@ import json
 import os
 from pathlib import Path
 
-from resume_assistant.resume_info_collector_agent import collect_info
-from resume_assistant.resume_analysis_agent import analyze_job
-from resume_assistant.resume_writing_agent import write_resume
-from resume_assistant.resume_feedback_agent import review_resume
+from resume_assistant.agents import collect_info, analyze_job, write_resume, review_resume
 
 
 def print_section_header(title: str):
