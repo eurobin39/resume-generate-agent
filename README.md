@@ -1,8 +1,8 @@
-# Resume Agent (Microsoft Agent Framework)
+# Resume / Code Assistant (Microsoft Agent Framework)
 
-Simple resume assistant built on Microsoft Agent Framework that routes user requests
-through four steps: collect user info, analyze job description, write a tailored resume,
-and provide feedback.
+Simple resume assistant and code assistant built on Microsoft Agent Framework 
+Resume Assistant routes user requests through four steps: collect user info, analyze job description, write a tailored resume, and provide feedback.
+Code Assistant routes user request through four steps : Triage, Explainer, Refactor, Documenter
 
 ## Setup
 1. Create and activate a virtual environment.
