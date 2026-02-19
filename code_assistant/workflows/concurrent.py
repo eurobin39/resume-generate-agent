@@ -3,12 +3,8 @@ from ..agents import get_explainer_agent, get_refactor_agent, get_documenter_age
 
 
 def build_concurrent_workflow():
-    return (
-        ConcurrentBuilder(name="code_assistant_concurrent")
-        .with_participants(
-            get_explainer_agent(),
-            get_refactor_agent(),
-            get_documenter_agent(),
-        )
-        .build()
-    )
+    return ConcurrentBuilder(name="code_assistant_concurrent").with_participants(
+        get_explainer_agent(),
+        get_refactor_agent(),
+        get_documenter_agent(),
+    ).build()

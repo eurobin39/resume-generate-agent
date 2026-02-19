@@ -55,20 +55,15 @@ python3 code_assistant/demo.py
 - `resume_assistant/workflows/`: sequential workflows (full/write/review/analyze)
 
 ## Workflows (Graph)
-Code Assistant (Handoff + Concurrent):
+Code Assistant (Concurrent Only):
 ```mermaid
 flowchart TD
-  R["Triage Agent"] --> H["Handoff Workflow"]
-  H --> E["Explainer Agent"]
-  H --> F["Refactor Agent"]
-  H --> G["Documenter Agent"]
+  C["Concurrent Workflow"] --> E["Explainer Agent"]
+  C --> F["Refactor Agent"]
+  C --> G["Documenter Agent"]
   E --> O["Response"]
   F --> O
   G --> O
-  R --> C["Concurrent Workflow"]
-  C --> E
-  C --> F
-  C --> G
 ```
 
 Resume Assistant (Graph/WorkflowBuilder with branching):
