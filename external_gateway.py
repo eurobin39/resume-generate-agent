@@ -1,3 +1,5 @@
+"""HTTP gateway that exposes resume and code assistants as simple APIs."""
+
 from __future__ import annotations
 
 import argparse
@@ -11,17 +13,22 @@ from resume_assistant.definition import orchestrator as resume_orchestrator
 
 
 def run_resume_agent(user_input: str, job_description: str = "") -> str:
+    """Run the resume assistant orchestrator with user and job inputs."""
     return resume_orchestrator(user_input=user_input, job_description=job_description, stream=False)
 
 
 def run_code_agent(user_request: str, code: str) -> str:
+    """Run the code assistant orchestrator for a code-focused request."""
     return code_orchestrator(user_request=user_request, code=code, stream=False)
 
 
 class AgentGatewayHandler(BaseHTTPRequestHandler):
+    """HTTP handler that exposes resume/code assistants as JSON APIs."""
+
     server_version = "AgentGateway/1.0"
 
     def _send_json(self, status: int, payload: dict[str, Any]) -> None:
+        """Send a JSON response with the given HTTP status code."""
         body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
@@ -30,6 +37,7 @@ class AgentGatewayHandler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def _read_json_body(self) -> dict[str, Any]:
+        """Read and parse a JSON object from the request body."""
         raw_len = self.headers.get("Content-Length")
         if not raw_len:
             return {}
@@ -43,12 +51,14 @@ class AgentGatewayHandler(BaseHTTPRequestHandler):
         return parsed
 
     def do_GET(self) -> None:  # noqa: N802
+        """Handle health checks."""
         if self.path == "/health":
             self._send_json(HTTPStatus.OK, {"status": "ok"})
             return
         self._send_json(HTTPStatus.NOT_FOUND, {"error": "Not found"})
 
     def do_POST(self) -> None:  # noqa: N802
+        """Handle agent execution requests for resume/code endpoints."""
         try:
             payload = self._read_json_body()
         except json.JSONDecodeError:
@@ -93,11 +103,12 @@ class AgentGatewayHandler(BaseHTTPRequestHandler):
             self._send_json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": str(exc)})
 
     def log_message(self, format: str, *args: Any) -> None:
-        # Keep default logging concise for local integration usage.
+        """Keep HTTP logs concise for local integration runs."""
         super().log_message(format, *args)
 
 
 def serve(host: str = "0.0.0.0", port: int = 8000) -> None:
+    """Start the gateway HTTP server."""
     server = ThreadingHTTPServer((host, port), AgentGatewayHandler)
     print(f"Agent gateway listening on http://{host}:{port}")
     print("Routes: GET /health, POST /v1/resume/run, POST /v1/code/run")
@@ -110,6 +121,7 @@ def serve(host: str = "0.0.0.0", port: int = 8000) -> None:
 
 
 def main() -> None:
+    """Parse CLI options and run the gateway server."""
     parser = argparse.ArgumentParser(description="Expose resume/code agents over HTTP.")
     parser.add_argument("--host", default="0.0.0.0", help="Bind host (default: 0.0.0.0)")
     parser.add_argument("--port", type=int, default=8000, help="Bind port (default: 8000)")

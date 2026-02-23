@@ -1,3 +1,5 @@
+"""Tool and orchestrator definitions for the resume assistant package."""
+
 from agent_framework import tool
 from agent_framework_utils import run_workflow_sync
 from .agents import collect_info, analyze_job, write_resume, review_resume
@@ -31,6 +33,7 @@ def review_resume_tool(resume_content: str, job_analysis: str) -> str:
 
 
 def _get_graph_workflow():
+    """Create or return the cached graph workflow instance."""
     global _graph_workflow
     if _graph_workflow is None:
         _graph_workflow = build_graph_workflow()
@@ -38,6 +41,7 @@ def _get_graph_workflow():
 
 
 def _messages_to_text(messages) -> str:
+    """Convert workflow message outputs into a single text response."""
     if not messages:
         return ""
     if isinstance(messages, str):
@@ -50,6 +54,7 @@ def _messages_to_text(messages) -> str:
 
 
 def orchestrator(user_input: str, job_description: str, stream: bool = False) -> str:
+    """Route resume requests through the graph workflow and return output."""
     prompt = (
         "User request:\n"
         f"{user_input}\n\n"

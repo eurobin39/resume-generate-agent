@@ -1,3 +1,5 @@
+"""Tool and orchestrator definitions for the code assistant package."""
+
 from agent_framework import tool
 from agent_framework_utils import run_workflow_sync
 from .agents import explain_code, refactor_code, document_code
@@ -26,6 +28,7 @@ def document_code_tool(code: str, doc_style: str = "google") -> str:
 
 
 def _get_concurrent_workflow():
+    """Create or return the cached concurrent workflow instance."""
     global _concurrent_workflow
     if _concurrent_workflow is None:
         _concurrent_workflow = build_concurrent_workflow()
@@ -33,6 +36,7 @@ def _get_concurrent_workflow():
 
 
 def _messages_to_text(messages) -> str:
+    """Convert workflow message outputs into a single text response."""
     if not messages:
         return ""
     parts = []
@@ -43,6 +47,7 @@ def _messages_to_text(messages) -> str:
 
 
 def orchestrator(user_request: str, code: str, stream: bool = False) -> str:
+    """Run the concurrent code assistant workflow for a user request."""
     prompt = (
         "User request:\n"
         f"{user_request}\n\n"

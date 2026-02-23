@@ -1,3 +1,5 @@
+"""CLI demo runner for the resume assistant pipeline."""
+
 import json
 import os
 from pathlib import Path
@@ -6,12 +8,14 @@ from resume_assistant.agents import collect_info, analyze_job, write_resume, rev
 
 
 def print_section_header(title: str):
+    """Print a formatted section title in the console."""
     print("\n" + "=" * 80)
     print(f"  {title}")
     print("=" * 80 + "\n")
 
 
 def run_demo():
+    """Run the end-to-end resume assistant demo with sample inputs."""
     sample_user_input = """
     EURO BAE
     Dublin, Ireland | +353 0834496428 | eurobin39@gmail.com
@@ -126,6 +130,7 @@ def run_demo():
 
 
 def _clean_profile(profile_json: str) -> str:
+    """Normalize extracted profile JSON for cleaner display/output."""
     try:
         data = json.loads(profile_json)
     except json.JSONDecodeError:
@@ -140,6 +145,7 @@ def _clean_profile(profile_json: str) -> str:
 
 
 def _merge_bullets(items: list) -> list:
+    """Merge bullet continuation lines into their parent item."""
     cleaned = []
     for item in items:
         text = str(item).strip()
@@ -157,6 +163,7 @@ def _merge_bullets(items: list) -> list:
 
 
 def _merge_skills(items: list) -> list:
+    """Normalize skill items by trimming whitespace and bullet markers."""
     cleaned = []
     for item in items:
         text = str(item).strip()
@@ -169,6 +176,7 @@ def _merge_skills(items: list) -> list:
 
 
 def _summarize_job_analysis(job_analysis: str) -> str:
+    """Build a short, human-readable summary from job analysis JSON."""
     try:
         data = json.loads(job_analysis)
     except json.JSONDecodeError:
@@ -180,6 +188,7 @@ def _summarize_job_analysis(job_analysis: str) -> str:
 
 
 def _summarize_feedback(feedback: str) -> str:
+    """Extract a concise score and top bullet points from feedback text."""
     lines = [line.strip() for line in feedback.splitlines() if line.strip()]
     score_line = next((l for l in lines if "score" in l.lower()), "Overall Score: N/A")
     bullets = [l.lstrip("-• ").strip() for l in lines if l.startswith(("-", "•"))]
@@ -191,6 +200,7 @@ def _summarize_feedback(feedback: str) -> str:
 
 
 def _save_resume_artifact(resume_tex: str) -> None:
+    """Write generated LaTeX resume to the local result directory."""
     out_dir = Path(__file__).resolve().parent / "resume_result"
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / "resume.tex"

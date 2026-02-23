@@ -1,3 +1,5 @@
+"""Shared helpers for Agent Framework client, agent, and workflow execution."""
+
 import os
 import asyncio
 from typing import Any, Optional
@@ -12,6 +14,7 @@ _client: Optional[AzureOpenAIChatClient] = None
 
 
 def _build_client() -> AzureOpenAIChatClient:
+    """Create an Azure OpenAI chat client from environment settings."""
     kwargs: dict[str, Any] = {}
 
     endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
@@ -35,6 +38,7 @@ def _build_client() -> AzureOpenAIChatClient:
 
 
 def get_client() -> AzureOpenAIChatClient:
+    """Return a cached Azure OpenAI chat client instance."""
     global _client
     if _client is None:
         _client = _build_client()
@@ -42,11 +46,13 @@ def get_client() -> AzureOpenAIChatClient:
 
 
 def create_agent(*, name: str, instructions: str, tools=None):
+    """Create an agent bound to the shared chat client."""
     client = get_client()
     return client.as_agent(name=name, instructions=instructions, tools=tools)
 
 
 def run_agent_sync(agent, prompt: str, **kwargs) -> str:
+    """Run an async agent call synchronously in non-async contexts."""
     async def _run() -> str:
         response = await agent.run(prompt, **kwargs)
         return response.text if hasattr(response, "text") else str(response)
@@ -59,6 +65,7 @@ def run_agent_sync(agent, prompt: str, **kwargs) -> str:
 
 
 def run_workflow_sync(workflow, prompt: str):
+    """Run an async workflow synchronously in non-async contexts."""
     async def _run():
         result = await workflow.run(prompt)
         if hasattr(result, "get_outputs"):

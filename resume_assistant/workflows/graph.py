@@ -1,3 +1,5 @@
+"""Graph workflow for routing resume assistant tasks by request mode."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -9,6 +11,7 @@ from ..agents import collect_info, analyze_job, write_resume, review_resume
 
 
 def _mode_is(*modes: str):
+    """Return a condition that matches payload mode values."""
     def _cond(message: Any) -> bool:
         return isinstance(message, dict) and message.get("mode") in modes
 
@@ -16,6 +19,7 @@ def _mode_is(*modes: str):
 
 
 def _ensure_payload(message: Any) -> dict:
+    """Normalize incoming workflow message to the expected payload shape."""
     if isinstance(message, dict):
         return dict(message)
     return {"user_input": str(message), "job_description": ""}
@@ -23,6 +27,7 @@ def _ensure_payload(message: Any) -> dict:
 
 @executor(id="route_request")
 async def route_request(message: dict, ctx: WorkflowContext[dict]) -> None:
+    """Select the execution mode based on user request and job description."""
     payload = _ensure_payload(message)
     selector = create_agent(
         name="resume_assistant_router",
@@ -44,6 +49,7 @@ async def route_request(message: dict, ctx: WorkflowContext[dict]) -> None:
 
 @executor(id="collect_info")
 async def collect_info_node(message: dict, ctx: WorkflowContext[dict]) -> None:
+    """Populate payload with structured user profile data."""
     payload = _ensure_payload(message)
     payload["user_profile"] = collect_info(payload.get("user_input", ""))
     await ctx.send_message(payload)
@@ -51,6 +57,7 @@ async def collect_info_node(message: dict, ctx: WorkflowContext[dict]) -> None:
 
 @executor(id="analyze_job")
 async def analyze_job_node(message: dict, ctx: WorkflowContext[dict]) -> None:
+    """Populate payload with structured job analysis data."""
     payload = _ensure_payload(message)
     payload["job_analysis"] = analyze_job(payload.get("job_description", ""))
     await ctx.send_message(payload)
@@ -58,6 +65,7 @@ async def analyze_job_node(message: dict, ctx: WorkflowContext[dict]) -> None:
 
 @executor(id="write_resume")
 async def write_resume_node(message: dict, ctx: WorkflowContext[dict]) -> None:
+    """Populate payload with generated resume output."""
     payload = _ensure_payload(message)
     payload["resume"] = write_resume(
         payload.get("user_profile", ""),
@@ -68,6 +76,7 @@ async def write_resume_node(message: dict, ctx: WorkflowContext[dict]) -> None:
 
 @executor(id="review_resume")
 async def review_resume_node(message: dict, ctx: WorkflowContext[dict]) -> None:
+    """Populate payload with resume review feedback."""
     payload = _ensure_payload(message)
     payload["feedback"] = review_resume(
         payload.get("resume", ""),
@@ -78,6 +87,7 @@ async def review_resume_node(message: dict, ctx: WorkflowContext[dict]) -> None:
 
 @executor(id="emit_output")
 async def emit_output_node(message: dict, ctx: WorkflowContext[None, str]) -> None:
+    """Render final text output sections based on selected mode."""
     payload = _ensure_payload(message)
     mode = payload.get("mode", "FULL_PIPELINE")
     sections: list[str] = []
@@ -100,6 +110,7 @@ async def emit_output_node(message: dict, ctx: WorkflowContext[None, str]) -> No
 
 
 def build_graph_workflow():
+    """Build and return the branching resume assistant workflow graph."""
     router = route_request
     collector = collect_info_node
     analyzer = analyze_job_node

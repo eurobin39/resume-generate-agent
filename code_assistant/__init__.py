@@ -1,3 +1,5 @@
+"""Public exports for the code assistant package."""
+
 from .agents import document_code, explain_code, refactor_code
 from .definition import orchestrator
 

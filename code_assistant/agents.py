@@ -1,3 +1,5 @@
+"""Code assistant agents and synchronous execution helpers."""
+
 from __future__ import annotations
 
 from agent_framework_utils import create_agent, run_agent_sync
@@ -8,6 +10,7 @@ _agent_documenter = None
 
 
 def _get_explainer():
+    """Create or return the cached explainer agent."""
     global _agent_explainer
     if _agent_explainer is None:
         _agent_explainer = create_agent(
@@ -23,6 +26,7 @@ def _get_explainer():
 
 
 def _get_refactor():
+    """Create or return the cached refactor agent."""
     global _agent_refactor
     if _agent_refactor is None:
         _agent_refactor = create_agent(
@@ -47,6 +51,7 @@ def _get_refactor():
 
 
 def _get_documenter():
+    """Create or return the cached documentation agent."""
     global _agent_documenter
     if _agent_documenter is None:
         _agent_documenter = create_agent(
@@ -70,18 +75,22 @@ def _get_documenter():
 
 
 def get_explainer_agent():
+    """Public accessor for the explainer agent instance."""
     return _get_explainer()
 
 
 def get_refactor_agent():
+    """Public accessor for the refactor agent instance."""
     return _get_refactor()
 
 
 def get_documenter_agent():
+    """Public accessor for the documentation agent instance."""
     return _get_documenter()
 
 
 def _build_doc_prompt(code: str, doc_style: str) -> str:
+    """Build a style-specific prompt for the documentation agent."""
     style_instructions = {
         "google": "Use Google-style docstrings with Args, Returns, Raises sections",
         "numpy": "Use NumPy-style docstrings with Parameters, Returns, Raises sections",
@@ -93,6 +102,7 @@ def _build_doc_prompt(code: str, doc_style: str) -> str:
 
 
 def explain_code(code: str, stream: bool = False) -> str:
+    """Return a plain-English explanation of the given code."""
     response = run_agent_sync(_get_explainer(), f"Explain this code:\n\n{code}")
     if stream:
         print(response)
@@ -100,6 +110,7 @@ def explain_code(code: str, stream: bool = False) -> str:
 
 
 def refactor_code(code: str, refactor_goal: str | None = None, stream: bool = False) -> str:
+    """Return a refactored version of the given code snippet."""
     if refactor_goal:
         prompt = f"Refactor this code with focus on: {refactor_goal}\n\n{code}"
     else:
@@ -111,6 +122,7 @@ def refactor_code(code: str, refactor_goal: str | None = None, stream: bool = Fa
 
 
 def document_code(code: str, doc_style: str = "google", stream: bool = False) -> str:
+    """Return code with added documentation in the requested style."""
     response = run_agent_sync(_get_documenter(), _build_doc_prompt(code, doc_style))
     if stream:
         print(response)

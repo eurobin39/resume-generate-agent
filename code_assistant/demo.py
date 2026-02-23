@@ -1,3 +1,5 @@
+"""CLI demo runner for the code assistant orchestrator."""
+
 import os
 import sys
 
@@ -9,11 +11,13 @@ sys.path.insert(0, parent_dir)
 from code_assistant.definition import orchestrator
 
 def print_section_header(title: str):
+    """Print a formatted section title in the console."""
     print("\n" + "=" * 80)
     print(f"  {title}")
     print("=" * 80 + "\n")
 
 def run_demo():
+    """Run sample code-assistant requests through the orchestrator."""
     # Sample code for testing
     sample_code = """
 def calculate(x, y):
