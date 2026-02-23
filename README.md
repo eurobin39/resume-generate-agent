@@ -32,6 +32,11 @@ Run the code assistant demo:
 python3 code_assistant/demo.py
 ```
 
+Run HTTP gateway for external frameworks:
+```bash
+python3 external_gateway.py --host 0.0.0.0 --port 8000
+```
+
 ## Demo Inputs and Results
 - `run_demo.py` currently includes a sample resume and job description.
 - For testing, replace `sample_user_input` with your own resume text and update `sample_job_description` with the target job details.
@@ -78,4 +83,34 @@ flowchart TD
   W --> V
   W --> O
   V --> O
+```
+
+## External Access
+Use either direct Python imports (for in-process frameworks) or HTTP (for out-of-process frameworks).
+
+Python import:
+```python
+from external_gateway import run_resume_agent, run_code_agent
+
+resume_output = run_resume_agent(
+    user_input="my resume text",
+    job_description="target role description",
+)
+
+code_output = run_code_agent(
+    user_request="refactor this function",
+    code="def f(x): return x+1",
+)
+```
+
+HTTP routes:
+- `GET /health`
+- `POST /v1/resume/run` body: `{"user_input":"...","job_description":"..."}`
+- `POST /v1/code/run` body: `{"user_request":"...","code":"..."}`
+
+Example:
+```bash
+curl -X POST http://localhost:8000/v1/resume/run \
+  -H "Content-Type: application/json" \
+  -d '{"user_input":"resume text","job_description":"backend engineer role"}'
 ```
